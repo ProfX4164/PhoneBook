@@ -1,0 +1,75 @@
+﻿@model ICollection<PhoneBook.DTO.Person>
+
+@{
+    Layout = null;
+}
+<style>
+    #People tbody tr {
+        cursor: pointer;
+    }
+</style>
+
+<input id="selectedPersonId" type="hidden" />
+
+<table class="table table-hover table-bordered table-striped table-sm">
+    <caption>List of users</caption>
+    <thead class="thead-dark">
+        <tr class="d-flex">
+            <th scope="col" class="col-5">Id</th>
+            <th scope="col" class="col-5">Имя</th>
+            <th scope="col" class="col-2"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="d-flex">
+                <td scope="row" class="col-5">@item.PersonId</td>
+                <td class="col-5">
+                    <div contenteditable>@item.Name</div>
+                </td>
+                <td class="col-2 text-center" id="@item.PersonId"><span class="oi oi-trash"></span></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $("#People tbody tr").each(function () {
+            var row = $(this);
+            var tds = row.find('td');
+            var selectedPersonId = row.find('td:first').html();
+
+            tds.each(function () {
+
+                if (tds.index($(this)) == 2) {
+                    $(this).click(function () {
+                        $.post('/Person/Delete/', { id: selectedPersonId }, function () {
+                            row.remove();
+                            selectedPersonId = $("#People tbody tr td").first().val();
+                            $('#selectedPersonId').val(selectedPersonId);
+                            $('#Phones').load('/Phone/Phones', { id: selectedPersonId });
+                        });
+                    });
+                } else {
+                    $(this).click(function () {
+                        $('#selectedPersonId').val(selectedPersonId);
+                        $('#Phones').load('/Phone/Phones', { PersonId: selectedPersonId });
+                    });
+                }
+
+                if (tds.index($(this)) == 1) {
+                    $(this).find('div').first().focusout(function () {
+                        var name = $(this).html();
+                        $.post('/Person/Update/', { PersonId: selectedPersonId, Name: name });
+                    });
+                }
+            });
+        });
+
+        var selectedId = $("#People tbody tr td:first").html();
+        $('#selectedPersonId').val(selectedId);
+        $('#Phones').load('/Phone/Phones', { PersonId: selectedId });
+    });
+</script>

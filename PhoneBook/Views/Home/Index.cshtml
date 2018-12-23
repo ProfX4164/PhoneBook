@@ -1,8 +1,71 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model ICollection<PhoneBook.DTO.Person>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="container" id="Main">
+    <div class="row">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Найти контакт" aria-label="Найти контакт" aria-describedby="basic-addon2" id="Pattern">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="Search">Найти</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Имя" aria-label="Имя" aria-describedby="basic-addon2" id="PersonName">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="AddPerson">Добавить </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Телефон" aria-label="Телефон" aria-describedby="basic-addon2" id="PhoneNumber">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="AddPhone">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div id="People" class="col-md-6">
+            @await Html.PartialAsync("~/Views/Person/_People.cshtml", Model)
+        </div>
+        <div id="Phones" class="col-md-6">
+        </div>
+    </div>
 </div>
+
+<script>
+    $('#AddPerson').click(function () {
+        var personName = $('#PersonName').val();
+
+        $.post('/Person/Add', { Name: personName }, function (data) {
+            if (data.success) {
+                $('#People').load('/Person/Search', { pattern: "" });
+            }
+        });
+    });
+
+    $('#AddPhone').click(function () {
+        var phoneNumber = $('#PhoneNumber').val();
+        var selectedPersonId = $('#selectedPersonId').val();
+
+        $.post('/Phone/Add', { PersonId: selectedPersonId, Number: phoneNumber }, function (data) {
+            if (data.success) {
+                $('#Phones').load('/Phone/Phones', { PersonId: data.personId });
+            }
+        });
+    });
+
+    $('#Search').click(function () {
+        var pattern = $('#Pattern').val();
+        $('#People').load('/Person/Search/', { pattern: pattern });
+    });
+
+    $('#Pattern').keyup(function () {
+        var pattern = $('#Pattern').val();
+        $('#People').load('/Person/Search/', { pattern: pattern });
+    });
+</script>
