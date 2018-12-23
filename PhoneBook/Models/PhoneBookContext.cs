@@ -15,7 +15,7 @@ namespace PhoneBook.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var stringConnection =
-                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PhoneBook;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                @"Server=tcp:nifon.database.windows.net,1433;Initial Catalog=PhoneBookDataBase;Persist Security Info=False;User ID={your_username};Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
             optionsBuilder
                 .UseSqlServer(stringConnection);
